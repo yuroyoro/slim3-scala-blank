@@ -3,6 +3,8 @@
 
     <property name="scala-library.jar"
       value="${scala.home}/lib/scala-library.jar" />
+    <property name="scala-compiler.jar"
+      value="${scala.home}/lib/scala-compiler.jar" />
 
     <path id="classpath">
         <pathelement path="war/WEB-INF/classes" />
@@ -77,12 +79,8 @@
     </target>
 
     <target name="copy">
-        <copy todir="war/WEB-INF/lib" file="../slim3/target/slim3-${ver}.jar"/>
-        <copy todir="libsrc" file="../slim3/target/slim3-${ver}-sources.jar"/>
-        <copy todir="lib" file="../slim3-gen/target/slim3-gen-${ver}.jar"/>
-        <copy todir="libsrc" file="../slim3-gen/target/slim3-gen-${ver}-sources.jar"/>
-        <copy todir="src" file="../slim3/src/main/resources/application_en.properties"/>
-        <copy todir="src" file="../slim3/src/main/resources/application_ja.properties"/>
+        <copy todir="lib" file="${scala-compiler.jar}"/>
+        <copy todir="war/WEB-INF/lib" file="${scala-library.jar}"/>
     </target>
 
     <target name="dist" depends="test">
@@ -98,7 +96,7 @@
         </zip>
     </target>
 
-    <target name="compile" >
+    <target name="compile" depends="copy" >
       <apt srcdir="${srcDir}" destdir="war/WEB-INF/classes"
               factory="org.slim3.gen.processor.ModelProcessorFactory"
               classpathref="classpath"
@@ -118,6 +116,12 @@
         <include name="**/*.scala"   />
         <exclude name="**/*.java"   />
       </scalac>
+
+      <copy todir="war/WEB-INF/classes">
+        <fileset dir="src">
+           <include name="**/*.properties" />
+        </fileset>
+      </copy>
     </target>
 
     <target name="test-compile" depends="compile">
